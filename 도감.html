@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>티니핑 도감</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #characterList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .character-button {
+      padding: 10px 15px;
+      background-color: #f5a9bc;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+    }
+    #characterInfo {
+      margin-top: 30px;
+      text-align: center;
+    }
+    #characterInfo img {
+      max-width: 200px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>티니핑 도감</h1>
+  <div id="characterList"></div>
+  <div id="characterInfo"></div>
+
+  <script>
+    const characters = {
+      "Hearts_ping": { "name": "하츄핑", "grade": "로열", "season": "1" },
+      "Baro_ping": { "name": "바로핑", "grade": "로열", "season": "1" },
+      "Aja_ping": { "name": "아자핑", "grade": "로열", "season": "1" },
+      "Chacha_ping": { "name": "차차핑", "grade": "로열", "season": "1" },
+      "Lala_ping": { "name": "라라핑", "grade": "로열", "season": "1" },
+      "Hae_ping": { "name": "해핑", "grade": "로열", "season": "1" },
+      "Dia_Hearts_ping": { "name": "다이아 하츄핑", "grade": "로열", "season": "2" },
+      "Joa_ping": { "name": "조아핑", "grade": "로열", "season": "2" },
+      "Bangle_ping": { "name": "방글핑", "grade": "로열", "season": "2" },
+      "Mideo_ping": { "name": "믿어핑", "grade": "로열", "season": "2" },
+      "Flora_Hearts_ping": { "name": "플로라 하츄핑", "grade": "로열", "season": "3" },
+      "kkulae_ping": { "name": "꾸래핑", "grade": "로열", "season": "3" },
+      "Nana_ping": { "name": "나나핑", "grade": "로열", "season": "3" },
+      "Soljji_ping": { "name": "솔찌핑", "grade": "로열", "season": "3" },
+      "Berry_Hearts_ping": { "name": "베리 하츄핑", "grade": "로열", "season": "4" },
+      "Posil_ping": { "name": "포실핑", "grade": "로열", "season": "4" },
+      "Malang_ping": { "name": "말랑핑", "grade": "로열", "season": "4" },
+      "Shasha_ping": { "name": "샤샤핑", "grade": "로열", "season": "4" },
+      "Star_Hearts_ping": { "name": "스타 하츄핑", "grade": "로열", "season": "5" },
+      "Bitna_ping": { "name": "빛나핑", "grade": "로열", "season": "5" },
+      "Cholong_ping": { "name": "초롱핑", "grade": "로열", "season": "5" },
+      "Panjjjak_ping": { "name": "빤짝핑", "grade": "로열", "season": "5" },
+      "Wangjia_ping": { "name": "왕자핑", "grade": "로열", "season": "5" },
+      "Haengun_ping": { "name": "행운핑", "grade": "레전드", "season": "3" },
+      "Saekom_ping": { "name": "새콤핑", "grade": "레전드", "season": "4" },
+      "Dalkom_ping": { "name": "달콤핑", "grade": "레전드", "season": "4" },
+      "Olola_ping": { "name": "오로라핑", "grade": "레전드", "season": "5" }
+    };
+
+    const listContainer = document.getElementById("characterList");
+    const infoContainer = document.getElementById("characterInfo");
+
+    for (const key in characters) {
+      const btn = document.createElement("button");
+      btn.className = "character-button";
+      btn.textContent = characters[key].name;
+      btn.onclick = () => showCharacter(key);
+      listContainer.appendChild(btn);
+    }
+
+    function showCharacter(key) {
+      const character = characters[key];
+      infoContainer.innerHTML = `
+        <img src="images/${key}.webp" alt="${key}">
+        <h2>${character.name}</h2>
+        <p><strong>등급:</strong> ${character.grade}</p>
+        <p><strong>시즌:</strong> ${character.season}</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
