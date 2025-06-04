@@ -147,26 +147,48 @@
     }
 
     function goBack() {
-      if (currentStep === "detail") {
-        // 상세 -> 캐릭터 목록
-        detail.innerHTML = "";
-        currentStep = "characters";
-        updateBackButton();
-      } else if (currentStep === "characters") {
-        // 캐릭터 목록 -> 시즌 목록
-        characterButtons.classList.add("hidden");
-        seasonButtons.classList.remove("hidden");
-        detail.innerHTML = "";
-        currentStep = "season";
-        updateBackButton();
-      } else if (currentStep === "season") {
-        // 시즌 목록 -> 등급 선택
-        seasonButtons.classList.add("hidden");
-        stepButtons.classList.remove("hidden");
-        currentStep = "grade";
-        updateBackButton();
-      }
+  if (currentStep === "detail") {
+    // 상세 -> 캐릭터 목록(시즌)으로 이동
+    detail.innerHTML = "";
+    if (currentGrade && currentSeason) {
+      // 시즌이 선택되어 있으면 캐릭터 목록 화면으로
+      currentStep = "characters";
+    } else if (currentGrade) {
+      // 시즌은 선택 안 되었지만 등급만 선택된 경우 시즌 목록 화면으로
+      currentStep = "season";
+    } else {
+      // 아무것도 선택 안 된 경우 등급 선택 화면으로
+      currentStep = "grade";
     }
+    updateBackButton();
+
+    if (currentStep === "characters") {
+      characterButtons.classList.remove("hidden");
+      seasonButtons.classList.add("hidden");
+    } else if (currentStep === "season") {
+      seasonButtons.classList.remove("hidden");
+      characterButtons.classList.add("hidden");
+    } else {
+      stepButtons.classList.remove("hidden");
+      seasonButtons.classList.add("hidden");
+      characterButtons.classList.add("hidden");
+    }
+
+  } else if (currentStep === "characters") {
+    // 캐릭터 목록 -> 시즌 목록
+    characterButtons.classList.add("hidden");
+    seasonButtons.classList.remove("hidden");
+    detail.innerHTML = "";
+    currentStep = "season";
+    updateBackButton();
+  } else if (currentStep === "season") {
+    // 시즌 목록 -> 등급 선택
+    seasonButtons.classList.add("hidden");
+    stepButtons.classList.remove("hidden");
+    currentStep = "grade";
+    updateBackButton();
+  }
+}
 
     function selectGrade(grade) {
       currentGrade = grade;
