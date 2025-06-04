@@ -1,49 +1,101 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>티니핑 도감</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       padding: 20px;
     }
-    h1 {
-      text-align: center;
+
+    #search {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
     }
-    #characterList {
+
+    .button-group {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      justify-content: center;
+      margin-bottom: 20px;
+      justify-content: center; /* ➕ 이 줄 추가 */
     }
-    .character-button {
-      padding: 10px 15px;
+
+    .button-group button {
+      flex: 1 1 30%;
+      min-width: 120px;
+      max-width: 200px;
+      padding: 12px;
       background-color: #f5a9bc;
       border: none;
       border-radius: 5px;
-      cursor: pointer;
       color: white;
       font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      box-sizing: border-box;
     }
-    #characterInfo {
+
+    #character-detail {
       margin-top: 30px;
-      text-align: center;
+      text-align: center;           /* 텍스트와 버튼 가운데 정렬 */
     }
-    #characterInfo img {
+
+    #character-detail img {
       max-width: 200px;
-      margin-bottom: 15px;
+      margin: 0 auto 10px auto;     /* 이미지 가운데 정렬 */
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* 뒤로가기 버튼 스타일 */
+    #back-button {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #back-button button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      background-color: #7a9eff;
+      color: white;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-
   <h1>티니핑 도감</h1>
-  <div id="characterList"></div>
-  <div id="characterInfo"></div>
+
+  <input type="text" id="search" placeholder="캐릭터 이름 검색..." />
+
+  <!-- 뒤로가기 버튼 추가 -->
+  <div id="back-button" class="hidden">
+    <button onclick="goBack()">← 뒤로가기</button>
+  </div>
+
+  <div class="button-group" id="step-buttons">
+    <button onclick="selectGrade('로열')">로열</button>
+    <button onclick="selectGrade('레전드')">레전드</button>
+  </div>
+
+  <div class="button-group hidden" id="season-buttons"></div>
+  <div class="button-group hidden" id="character-buttons"></div>
+
+  <div id="character-detail"></div>
+
+  <h2>⭐ 즐겨찾기</h2>
+  <ul id="favorites"></ul>
 
   <script>
-    const characters = {
+    const data = {
       "Hearts_ping": { "name": "하츄핑", "grade": "로열", "season": "1" },
       "Baro_ping": { "name": "바로핑", "grade": "로열", "season": "1" },
       "Aja_ping": { "name": "아자핑", "grade": "로열", "season": "1" },
@@ -73,27 +125,123 @@
       "Olola_ping": { "name": "오로라핑", "grade": "레전드", "season": "5" }
     };
 
-    const listContainer = document.getElementById("characterList");
-    const infoContainer = document.getElementById("characterInfo");
+    const stepButtons = document.getElementById("step-buttons");
+    const seasonButtons = document.getElementById("season-buttons");
+    const characterButtons = document.getElementById("character-buttons");
+    const detail = document.getElementById("character-detail");
+    const favorites = document.getElementById("favorites");
+    const searchInput = document.getElementById("search");
+    const backButtonDiv = document.getElementById("back-button");
 
-    for (const key in characters) {
-      const btn = document.createElement("button");
-      btn.className = "character-button";
-      btn.textContent = characters[key].name;
-      btn.onclick = () => showCharacter(key);
-      listContainer.appendChild(btn);
+    let currentGrade = "";
+    let currentSeason = "";
+    let currentStep = "grade"; // 현재 단계: grade, season, characters, detail
+
+    function updateBackButton() {
+      // grade 단계에서는 뒤로가기 숨김
+      if (currentStep === "grade") {
+        backButtonDiv.classList.add("hidden");
+      } else {
+        backButtonDiv.classList.remove("hidden");
+      }
     }
 
-    function showCharacter(key) {
-      const character = characters[key];
-      infoContainer.innerHTML = `
-        <img src="images/${key}.webp" alt="${key}">
-        <h2>${character.name}</h2>
-        <p><strong>등급:</strong> ${character.grade}</p>
-        <p><strong>시즌:</strong> ${character.season}</p>
+    function goBack() {
+      if (currentStep === "detail") {
+        // 상세 -> 캐릭터 목록
+        detail.innerHTML = "";
+        currentStep = "characters";
+        updateBackButton();
+      } else if (currentStep === "characters") {
+        // 캐릭터 목록 -> 시즌 목록
+        characterButtons.classList.add("hidden");
+        seasonButtons.classList.remove("hidden");
+        detail.innerHTML = "";
+        currentStep = "season";
+        updateBackButton();
+      } else if (currentStep === "season") {
+        // 시즌 목록 -> 등급 선택
+        seasonButtons.classList.add("hidden");
+        stepButtons.classList.remove("hidden");
+        currentStep = "grade";
+        updateBackButton();
+      }
+    }
+
+    function selectGrade(grade) {
+      currentGrade = grade;
+      stepButtons.classList.add("hidden");
+
+      const seasons = new Set(
+        Object.values(data)
+          .filter(c => c.grade === grade)
+          .map(c => c.season)
+      );
+
+      seasonButtons.innerHTML = "";
+      seasons.forEach(season => {
+        const btn = document.createElement("button");
+        btn.textContent = `${season} 시즌`;
+        btn.onclick = () => selectSeason(season);
+        seasonButtons.appendChild(btn);
+      });
+
+      seasonButtons.classList.remove("hidden");
+      characterButtons.classList.add("hidden");
+      detail.innerHTML = "";
+      currentStep = "season";
+      updateBackButton();
+    }
+
+    function selectSeason(season) {
+      currentSeason = season;
+      seasonButtons.classList.add("hidden");
+
+      const characters = Object.entries(data)
+        .filter(([key, c]) => c.grade === currentGrade && c.season === season);
+
+      characterButtons.innerHTML = "";
+      characters.forEach(([key, c]) => {
+        const btn = document.createElement("button");
+        btn.textContent = c.name;
+        btn.onclick = () => showCharacter(key, c);
+        characterButtons.appendChild(btn);
+      });
+
+      characterButtons.classList.remove("hidden");
+      detail.innerHTML = "";
+      currentStep = "characters";
+      updateBackButton();
+    }
+
+    function showCharacter(key, character) {
+      detail.innerHTML = `
+        <img src="images/${key}.webp" alt="${character.name}">
+        <h3>${character.name}</h3>
+        <p>등급: ${character.grade}</p>
+        <p>시즌: ${character.season}</p>
+        <button onclick="addFavorite('${character.name}')">⭐ 즐겨찾기 추가</button>
       `;
+      currentStep = "detail";
+      updateBackButton();
     }
-  </script>
 
+    function addFavorite(name) {
+      if ([...favorites.children].some(li => li.textContent === name)) return;
+      const li = document.createElement("li");
+      li.textContent = name;
+      favorites.appendChild(li);
+    }
+
+    searchInput.addEventListener("input", () => {
+      const keyword = searchInput.value.trim();
+      if (!keyword) return;
+
+      const matched = Object.entries(data).find(([k, v]) => v.name.includes(keyword));
+      if (matched) {
+        showCharacter(matched[0], matched[1]);
+      }
+    });
+  </script>
 </body>
 </html>
